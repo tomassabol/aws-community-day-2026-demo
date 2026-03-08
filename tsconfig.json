@@ -1,0 +1,14 @@
+{
+  "extends": "@tsconfig/node22",
+  "compilerOptions": {
+    "types": ["node", "jest"],
+    "lib": ["ESNext"],
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./src/*"]
+    }
+  },
+  "include": ["infra/**/*.ts", "src/**/*.ts", "test/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}
