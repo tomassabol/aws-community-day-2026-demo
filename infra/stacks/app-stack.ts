@@ -10,7 +10,7 @@ import { ApiFunction } from "../constructs/functions/api/api-function"
 export class AppStack extends BaseStack {
   constructor(appContext: AppContext, stackConfig: StackConfig) {
     super(appContext, stackConfig, {
-      description: `AWS CloudControl MCP Server - [${appContext.stageName}]`,
+      description: `AWS Demo - [${appContext.stageName}]`,
     })
 
     /**

@@ -1,0 +1,30 @@
+type Query {
+  listSubmissions: [Submission!]!
+}
+
+type Mutation {
+  createSubmissionWithLambda(input: CreateSubmissionInput!): Submission!
+  createSubmissionDirect(input: CreateSubmissionInput!): Submission!
+}
+
+type Submission {
+  id: ID!
+  title: String!
+  speaker: String!
+  level: String!
+  tags: [String!]!
+  pathType: String!
+  createdAt: AWSDateTime!
+}
+
+input CreateSubmissionInput {
+  title: String!
+  speaker: String!
+  level: String!
+  tags: [String!]!
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+}

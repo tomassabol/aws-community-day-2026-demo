@@ -1,3 +1,5 @@
+import path from "node:path"
+
 import {
   type IBaseConstruct,
   type NodeJsFunctionSimplePatternProps,
@@ -37,6 +39,7 @@ export const defaultNodeJsFunctionSimplePatternProps = (
   const { bundling, environment, ...restProps } = props // Hoist props which will be merged separately
 
   return {
+    depsLockFilePath: path.join(process.cwd(), "bun.lock"),
     runtime: lambda.Runtime.NODEJS_22_X,
     warmUp: isProduction,
     logRetention: RetentionDays.THREE_MONTHS,

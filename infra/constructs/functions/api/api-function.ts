@@ -19,7 +19,7 @@ export class ApiFunction extends BaseConstruct {
     const { lambdaFunction } = new NodeJsFunctionSimplePattern(
       ...defaultNodeJsFunctionSimplePatternArgs(this, id, {
         description: "API",
-        entry: "src/functions/api/api-function.ts",
+        entry: "src/api/handler.ts",
         timeout: cdk.Duration.minutes(1),
       }),
     )

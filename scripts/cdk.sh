@@ -4,7 +4,7 @@ HOMEDIR=$(dirname $0)
 ROOTDIR="$HOMEDIR/.."
 VERSION=v1
 VALID_STACKS="app app-pipeline config-pipeline"
-PROJECT_NAME="aws-cloudcontrol"
+PROJECT_NAME="aws-demo"
 
 print_usage() {
   echo "Usage:"

@@ -1,6 +1,6 @@
 {
   "project": {
-    "name": "aws-cloudcontrol",
+    "name": "aws-sk",
     "stage": "ts",
     "account": "849368888067",
     "region": "eu-central-1"
@@ -8,6 +8,18 @@
   "stacks": {
     "app": {
       "name": "app"
+    },
+    "demo-01": {
+      "name": "demo-01"
+    },
+    "demo-02": {
+      "name": "demo-02"
+    },
+    "demo-03": {
+      "name": "demo-03"
+    },
+    "demo-04": {
+      "name": "demo-04"
     }
   }
 }

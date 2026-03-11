@@ -1,90 +1,131 @@
-# AWS Cloud Control Agent
+# You may not need a Lambda
 
-AWS Cloud Control Agent is an autonomous AI agent that investigates CloudWatch alarms and performs root cause analysis on AWS infrastructure issues. When alarms trigger, the agent automatically queries logs, analyzes metrics, and provides actionable recommendations — all powered by Claude Sonnet 4 via Amazon Bedrock.
+# AWS Community Day 2026 – Demo Collection
 
-## Architecture
+A collection of hands-on demos showcasing **direct AWS service integrations** vs **Lambda-mediated** patterns. Each demo illustrates when and how to choose native integrations for lower latency, reduced cost, and simpler architectures.
 
-1. **CloudWatch Alarm** triggers when metrics breach thresholds
-2. **EventBridge Rule** captures alarm state changes
-3. **Step Functions** orchestrates the analysis workflow
-4. **Lambda Agent** runs the AI-powered investigation using Claude Sonnet 4
-5. **AWS APIs** provide read-only access to infrastructure data
+## Demos Overview
 
-## Getting Started
+| Demo        | Topic                                                     | Key Services                                                   |
+| ----------- | --------------------------------------------------------- | -------------------------------------------------------------- |
+| **Demo 01** | Lambda vs direct EventBridge integration                  | API Gateway, EventBridge, SQS                                  |
+| **Demo 02** | AppSync direct resolvers vs Lambda resolvers              | AppSync, DynamoDB                                              |
+| **Demo 03** | Return processing with Step Functions direct integrations | Step Functions, DynamoDB, Rekognition, Bedrock, SNS, Translate |
+| **Demo 04** | AppSync direct integration with Aurora Data API           | AppSync, Aurora Serverless, RDS Data API                       |
 
-### Prerequisites
+### Demo 01 – EventBridge: Lambda vs Direct Integration
 
-- Node.js 22+
-- AWS CLI configured with appropriate credentials
+Compares publishing events from API Gateway via **Lambda** vs **direct EventBridge integration**. Both paths trigger the same downstream consumers (SQS, Lambda validators), demonstrating trade-offs in latency and architecture.
 
-### Installation
+- **Endpoints**: `POST /submissions/lambda` vs `POST /submissions/direct`
+- **Outputs**: Event bus, observation queue, API URL
+
+### Demo 02 – AppSync: Direct Resolvers vs Lambda
+
+GraphQL API with two mutation paths for creating submissions:
+
+- **Direct resolver** – JavaScript resolver talking to DynamoDB
+- **Lambda resolver** – TypeScript Lambda with business logic
+
+Both read from the same DynamoDB table; ideal for comparing cold starts and operational complexity.
+
+### Demo 03 – Step Functions Direct Integrations
+
+E-commerce return processing workflow using Step Functions with **native AWS integrations** (no Lambda):
+
+- **DynamoDB** – Put/Get items
+- **Rekognition** – Image label detection
+- **Bedrock** – Fraud recommendation (Nova Micro)
+- **Translate** – Multi-language notifications
+- **SNS** – Customer notifications
+
+Demonstrates building a full workflow with only state machine states and direct service calls.
+
+### Demo 04 – AppSync + Aurora Data API
+
+AppSync GraphQL API directly integrated with **Aurora Serverless v2** via the **Data API**. No Lambda or VPC resolvers—queries and mutations go straight from AppSync to Aurora.
+
+- **VPC** – Isolated subnets for Aurora
+- **Aurora Serverless v2** – PostgreSQL with Data API
+- **AppSync** – HTTP resolver calling Data API
+
+---
+
+## Prerequisites
+
+- **Bun** or Node.js 22+
+- **AWS CLI** configured with appropriate credentials
+- **AWS CDK** (`bunx cdk` or `npx cdk`)
+
+## Installation
 
 ```bash
-npm install
+bun install
 ```
 
-### Deploy
+## Deployment
 
-Deploy the application stack:
+Deploy all stacks (app + demo-01 through demo-04):
 
 ```bash
 ./scripts/cdk.sh deploy app --profile <AWS-PROFILE> --stage <STAGE>
 ```
 
-Deploy the CI/CD pipeline (optional):
+Example:
+
+```bash
+./scripts/cdk.sh deploy app --profile default --stage ts
+```
+
+Other commands:
+
+```bash
+./scripts/cdk.sh synth app --profile <PROFILE> --stage <STAGE>
+./scripts/cdk.sh diff app --profile <PROFILE> --stage <STAGE>
+./scripts/cdk.sh destroy app --profile <PROFILE> --stage <STAGE>
+```
+
+### CI/CD pipeline (optional)
 
 ```bash
 ./scripts/cdk.sh deploy app-pipeline --profile <AWS-PROFILE> --stage <STAGE>
 ```
 
-## How It Works
+---
 
-When a CloudWatch alarm triggers, the agent:
+## Project Structure
 
-1. **Extracts Context** — Parses alarm name, description, region, timestamp, and affected resources
-2. **Queries Logs** — Searches CloudWatch Logs for errors around the alarm timestamp
-3. **Analyzes Patterns** — Identifies error patterns, stack traces, and anomalies
-4. **Checks Configuration** — Inspects Lambda/service configuration for misconfigurations
-5. **Generates Report** — Produces a structured analysis with:
-   - **Root Cause** — Brief explanation of what went wrong
-   - **Evidence** — Key log entries and metrics supporting the conclusion
-   - **Recommendations** — Specific actions to fix or prevent the issue
-
-### Example Output
-
-```json
-{
-  "statusCode": 200,
-  "body": {
-    "summary": "Root Cause: The Lambda function timed out due to...",
-    "metadata": {
-      "alarmName": "lambda-errors-high",
-      "region": "eu-west-1",
-      "timestamp": "2025-01-05T10:30:00Z",
-      "steps": 5,
-      "tokensUsed": {
-        "input": 2500,
-        "output": 800
-      }
-    }
-  }
-}
 ```
+├── infra/
+│   ├── config/           # App config per stage
+│   ├── constructs/       # CDK constructs
+│   └── stacks/           # Demo stacks
+├── scripts/
+│   └── cdk.sh            # CDK deploy/synth/diff/destroy
+└── src/
+    ├── api/              # Shared API handlers
+    ├── appsync/          # GraphQL schemas and resolvers
+    ├── demo/             # Shared demo utilities
+    ├── functions/        # Lambda handlers
+    └── shared/           # Shared contracts and types
+```
+
+---
 
 ## Technology Stack
 
-| Category           | Technology                         |
-| ------------------ | ---------------------------------- |
-| **Runtime**        | Node.js 22, Bun (development)      |
-| **Language**       | TypeScript 5.9                     |
-| **AI/LLM**         | Claude Sonnet 4 via Amazon Bedrock |
-| **AI Framework**   | Vercel AI SDK 6.0                  |
-| **Infrastructure** | AWS CDK 2.222                      |
-| **Compute**        | AWS Lambda                         |
-| **Orchestration**  | AWS Step Functions                 |
-| **Events**         | Amazon EventBridge                 |
-| **Validation**     | Zod                                |
-| **Testing**        | Jest                               |
+| Category       | Technology                  |
+| -------------- | --------------------------- |
+| Runtime        | Bun / Node.js 22            |
+| Language       | TypeScript 5.9              |
+| Infrastructure | AWS CDK 2.x                 |
+| API            | API Gateway REST, AppSync   |
+| Compute        | Lambda, Step Functions      |
+| Data           | DynamoDB, Aurora Serverless |
+| AI/ML          | Amazon Bedrock (Nova Micro) |
+| Validation     | Zod                         |
+
+---
 
 ## License
 
